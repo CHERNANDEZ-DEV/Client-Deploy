@@ -1,28 +1,109 @@
-// src/components/PerfilCard.jsx
-
-import React, { useContext } from 'react';
-import { UserContext } from '../utils/UserContext'; // Asegúrate de ajustar la ruta según tu estructura de archivos
-import image from '../assets/userimage.png';
+import React, { useContext, useEffect, useState } from 'react';
+import { UserContext } from '../utils/UserContext';
+import defaultImage from '../assets/profile.png';
+import { getUserProfile, changeUsername, changeDui } from '../services/userService';
 
 const PerfilCardComp = () => {
-    const { user } = useContext(UserContext);
+    const { user, setUser } = useContext(UserContext);
+    const [userImage, setUserImage] = useState(defaultImage);
+    const [username, setUsername] = useState('');
+    const [dui, setDui] = useState('');
+    const [numHome, setHouseNumber] = useState('Casa #No asignado');
+    const [isEditing, setIsEditing] = useState(false);
 
-    // Para depuración, agrega un console.log para ver si user se está obteniendo
-    console.log('User context:', user);
-    
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            try {
+                const profile = await getUserProfile();
+                setUser(profile);
+                setUsername(profile.name);
+                setDui(profile.dui || '00000000-0'); // Set default DUI if none is assigned
+                const picture = localStorage.getItem("picture") || profile.pictureurl;
+                if (picture) {
+                    setUserImage(picture);
+                }
+                if (profile.roles.includes("Residente encargado") || profile.roles.includes("Residente normal")) {
+                    setHouseNumber(profile.home ? `Casa #${profile.home}` : 'Casa #No asignado');
+                } else {
+                    setHouseNumber(null);
+                }
+            } catch (error) {
+                console.error("Error fetching user profile:", error);
+            }
+        };
+
+        fetchUserProfile();
+    }, [setUser]);
+
+    const handleSaveChanges = async () => {
+        try {
+            await changeUsername(username);
+            await changeDui(dui);
+            setIsEditing(false);
+            const profile = await getUserProfile(); // Refresca los datos del perfil
+            setUser(profile);
+            setUsername(profile.name);
+            setDui(profile.dui || '00000000-0'); // Set default DUI if none is assigned
+            const picture = localStorage.getItem("picture") || profile.pictureurl;
+            if (picture) {
+                setUserImage(picture);
+            }
+            if (profile.roles.includes("Residente encargado") || profile.roles.includes("Residente normal")) {
+                setHouseNumber(profile.home ? `Casa #${profile.home}` : 'Casa #No asignado');
+            } else {
+                setHouseNumber(null);
+            }
+        } catch (error) {
+            console.error("Error updating profile:", error);
+        }
+    };
+
     if (!user) return <div>Loading...</div>;
 
     return (
         <div className='flex items-center justify-center h-screen'>
-        <div className="flex flex-col items-center bg-gray-900 w-4/5 rounded-2xl font-roboto_mono text-white">
-            <div className="mt-12 mb-4">
-            <img src={image} alt="Avatar" className="w-40 h-40 rounded-full" />
+            <div className="flex flex-col items-center bg-gray-900 w-4/5 rounded-2xl font-roboto_mono text-white p-6">
+                <div className="mt-12 mb-4">
+                    <img src={userImage} alt="Avatar" className="w-40 h-40 rounded-full object-cover" />
+                </div>
+                {isEditing ? (
+                    <div className="flex flex-col items-center w-full">
+                        <input
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            className="text-center text-3xl mb-2 bg-gray-700 p-2 rounded w-full"
+                        />
+                        <input
+                            type="text"
+                            value={dui}
+                            onChange={(e) => setDui(e.target.value)}
+                            className="text-center text-base sm:text-2xl mb-2 bg-gray-700 p-2 rounded w-full"
+                        />
+                        <button
+                            className='bg-amarillo-principal text-black py-2 px-4 rounded-md font-roboto_mono mt-4'
+                            onClick={handleSaveChanges}
+                        >
+                            Guardar Cambios
+                        </button>
+                    </div>
+                ) : (
+                    <div className="flex flex-col items-center w-full">
+                        <p className='text-center text-3xl mb-2'>{username}</p>
+                        <p className='text-center text-base sm:text-2xl mb-2'>{user.email}</p>
+                        <p className='text-center text-base sm:text-2xl mb-2'>
+                            <span className="font-bold">DUI: </span>{dui}
+                        </p>
+                        {numHome && <p className='text-center text-2xl mb-2'>{numHome}</p>}
+                        <button
+                            className='bg-amarillo-principal text-black py-2 px-4 rounded-md font-roboto_mono mt-4'
+                            onClick={() => setIsEditing(true)}
+                        >
+                            Editar Perfil
+                        </button>
+                    </div>
+                )}
             </div>
-            <p className='text-center text-3xl mb-2'>{user.name}</p>
-            <p className='text-center text-base sm:text-2xl mb-2'>{user.email}</p>
-            <p className='text-center text-2xl mb-2'>{user.id}</p>
-            <p className='text-center text-2xl mb-12'>{user.address}</p>
-        </div>
         </div>
     );
 }

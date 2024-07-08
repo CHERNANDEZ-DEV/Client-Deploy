@@ -1,20 +1,21 @@
-// src/contexts/UserContext.js
-
-import React, { createContext, useState } from 'react';
+// UserContext.js
+import React, { createContext, useState, useEffect } from 'react';
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState({
-    name: 'Carlos Hernández',
-    email: '00002721@uca.edu.sv',
-    id: '06306281-7',
-    address: 'Casa N°12'
-  });
+    const [user, setUser] = useState(null);
 
-  return (
-    <UserContext.Provider value={{ user, setUser }}>
-      {children}
-    </UserContext.Provider>
-  );
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
+    }, []);
+
+    return (
+        <UserContext.Provider value={{ user, setUser }}>
+            {children}
+        </UserContext.Provider>
+    );
 };

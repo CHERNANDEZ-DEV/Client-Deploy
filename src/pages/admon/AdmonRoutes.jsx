@@ -11,7 +11,7 @@ import GestionHogar from './GestionHogar';
 const AdmonRoutes = () => {
 
     const adminMenuItems = [
-        { label: 'Entradas', url: '/admon/history' },
+        { label: 'Entradas', url: '/admon' },
         { label: 'Gestionar Hogares', url: '/admon/manager' },
         { label: 'Historial', url: '/admon/home' },
         { label: 'Gestionar Guardias', url: '/admon/guard' },
@@ -24,7 +24,7 @@ const AdmonRoutes = () => {
                 <Route path="/home" element={<Home />} />
                 <Route path="/manager" element={<HomeManager />} />
                 <Route path="/guard" element={<Guard />} />
-                <Route path="/history" element={<History />} />
+                <Route path="/" element={<History />} />
                 <Route path="/gestionar/:houseNumber" element={<GestionHogar />} />
                 <Route path="/" element={<Navigate to="/admon/history" />} />
             </Routes>

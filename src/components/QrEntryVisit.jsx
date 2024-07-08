@@ -5,14 +5,14 @@ import { motion } from 'framer-motion';
 import { ClipLoader } from 'react-spinners';
 import { useMediaQuery } from 'react-responsive';
 
-const QrEntry = () => {
+const QrEntry = ({ invitationId }) => {
   const [qrString, setQrString] = useState('');
   const [userData, setUserData] = useState({ email: '', home: '' });
   const [qrLoaded, setQrLoaded] = useState(false); // Estado para controlar si el QR se ha cargado
 
   const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' });
 
-  const fetchQrString = async () => {
+  const fetchQrString = async (id) => {
     const token = localStorage.getItem('access_token'); // Obtener el token del localStorage
 
     if (!token) {
@@ -21,7 +21,7 @@ const QrEntry = () => {
     }
 
     try {
-      const response = await axios.get('https://securityflow.onrender.com/qr/general/generate', {
+      const response = await axios.get(`https://securityflow.onrender.com/qr/generate/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -57,9 +57,11 @@ const QrEntry = () => {
   };
 
   useEffect(() => {
-    fetchQrString();
+    if (invitationId) {
+      fetchQrString(invitationId);
+    }
     fetchUserData();
-  }, []); // Dependencias vacías aseguran que se ejecuta solo una vez
+  }, [invitationId]); // Dependencias aseguran que se ejecuta al cambiar el ID de la invitación
 
   return (
     <div className='flex flex-col justify-center items-center h-screen'>
@@ -89,6 +91,7 @@ const QrEntry = () => {
 }
 
 export default QrEntry;
+
 
 
 

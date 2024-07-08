@@ -5,18 +5,18 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 import { BrowserRouter } from 'react-router-dom';
-
+import MQTTComponent from './components/MQTTComponent.jsx';
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <GoogleOAuthProvider clientId='655681073497-3mvehg16qtcm65061cioohc45h9dsbeu.apps.googleusercontent.com'>
-    <UserProvider>
+  <GoogleOAuthProvider clientId='927856352370-jlatbrbc93vf8so236e2c8u5kqaipttd.apps.googleusercontent.com'>
       <React.StrictMode>
         <BrowserRouter>
+          <UserProvider>
             <App/>
+          </UserProvider>
         </BrowserRouter>
       </React.StrictMode>
-    </UserProvider>
   </GoogleOAuthProvider>
 )
 

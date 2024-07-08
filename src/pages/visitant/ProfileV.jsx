@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
 import PerfilCardComp from '../../components/PerfilCardComp';
 
-const ProfileV = ({ profile }) => {
-
+const ProfileV = () => {
   return (
-    <div>
-        <PerfilCardComp/>
+    <div >
+            <PerfilCardComp />
     </div>
   );
 };

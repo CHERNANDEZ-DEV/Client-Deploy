@@ -4,6 +4,7 @@ import { getToken } from './authService';
 const API_URL = 'https://securityflow.onrender.com';
 
 const axiosInstance = axios.create({
+  // baseURL
   baseURL: API_URL,
   headers: {
     'Authorization': `Bearer ${getToken()}`
